@@ -1,0 +1,24 @@
+{
+    "name": "todo-masters-initial",
+    "version": "1.0.0",
+    "description": "A beautiful todo app for learning design patterns",
+    "main": "app.js",
+    "scripts": {
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "serve": "serve -s . -l 3000"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0",
+        "serve": "^14.2.1"
+    },
+    "keywords": [
+        "todo",
+        "design-patterns",
+        "javascript",
+        "vanilla-js",
+        "frontend"
+    ],
+    "author": "TodoMasters",
+    "license": "MIT"
+}
