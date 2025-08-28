@@ -7,3 +7,5 @@ class TodoItem {
     return other.text === this.text
   }
 }
+
+export default TodoItem

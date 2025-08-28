@@ -13,3 +13,5 @@ const observerMixin = {
     this.observers.forEach(observer => observer())
   },
 }
+
+export default observerMixin

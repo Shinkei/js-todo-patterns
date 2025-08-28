@@ -1,3 +1,6 @@
+import observerMixin from '../mixings/observerMixin.js'
+import TodoItem from './TodoItem.js'
+
 class TodoList {
   #data = new Set()
 
@@ -34,4 +37,44 @@ class TodoList {
   get items() {
     return this.#data
   }
+
+  add(item) {
+    const newItem = new TodoItem(item.text)
+    const todoArray = Array.from(this.#data)
+    const isTodoPresent = todoArray.some(existingItem =>
+      existingItem.equals(newItem)
+    )
+    if (!isTodoPresent) {
+      this.#data.add(newItem)
+      this.notify()
+    }
+  }
+
+  delete(item) {
+    const itemToDelete = new TodoItem(item.text)
+    const todoArray = Array.from(this.#data)
+    const todoItemFound = todoArray.find(existingItem =>
+      existingItem.equals(itemToDelete)
+    )
+    if (todoItemFound) {
+      this.#data.delete(todoItemFound)
+      this.notify()
+    }
+  }
+
+  find(item) {
+    const todoArray = Array.from(this.#data)
+    const todoItemFound = todoArray.find(existingItem =>
+      existingItem.equals(item)
+    )
+    return todoItemFound || null
+  }
+
+  replaceList(newList) {
+    this.#data = newList
+    this.notify()
+  }
 }
+
+// apply the mixing to the class, this adds observer pattern methods to TodoList like an abstract class
+Object.assign(TodoList.prototype, observerMixin)
