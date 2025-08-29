@@ -1,18 +1,8 @@
 # 📚 Personal Design Patterns Knowledge Base
 
-> *My reference guide for design patterns implementations in JavaS---
+> *My reference guide for design patterns implementations in JavaScript*
 
-## �️ Currently Implemented Pa### 2. **Observe---
-
-## 📁 File Structure & Pattern Mapping
-
-```
-src/
-├── TodoList.js        # 👤 Singleton + 👀 Observer (via mixin)
-├── TodoItem.js        # Simple value object/data structure
-mixings/
-├── observerMixin.js   # 👀 Observer pattern implementation
-``` 👀ternsrpose
+## 🎯 Purpose
 
 This repository serves as my personal knowledge base for understanding and implementing design patterns in JavaScript. It uses a simple todo application as the foundation to demonstrate various architectural patterns in real, working code.
 
@@ -53,8 +43,8 @@ classDiagram
     TodoList --> TodoItem : contains
     TodoList ..|> observerMixin : implements via mixin
     
-    note for TodoList "� Singleton Pattern\n� Observer Pattern"
-    note for observerMixin "� Observer Pattern\nReusable via mixin"
+    note for TodoList "🔹 Singleton Pattern\n🔹 Observer Pattern"
+    note for observerMixin "🔹 Observer Pattern\nReusable via mixin"
     
     classDef singleton fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     classDef observer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
@@ -74,11 +64,11 @@ sequenceDiagram
     participant O1 as Observer1
     participant O2 as Observer2
     
-    Note over TL: � Singleton Pattern
+    Note over TL: 🔹 Singleton Pattern
     C->>TL: getInstance()
     TL-->>C: same instance always
     
-    Note over TL,O2: � Observer Pattern Setup
+    Note over TL,O2: 🔹 Observer Pattern Setup
     C->>TL: addObserver(Observer1)
     C->>TL: addObserver(Observer2)
     
@@ -96,8 +86,8 @@ sequenceDiagram
 ### **Pattern Application Map**
 ```mermaid
 flowchart TD
-    A[🎯 TodoMasters App] --> B[� Singleton Pattern]
-    A --> C[� Observer Pattern]
+    A[🎯 TodoMasters App] --> B[🔹 Singleton Pattern]
+    A --> C[🔹 Observer Pattern]
     
     B --> D[📍 TodoList.getInstance]
     B --> E[🗂️ Global State Management]
@@ -121,19 +111,7 @@ flowchart TD
     class D,E,F,G,H,I feature
 ```
 
-## 📁 File Structure & Pattern Mapping
-
-```
-src/
-├── TodoList.js        # 👤 Singleton + 👀 Observer (via mixin)
-├── TodoItem.js        # Simple value object/data structure
-mixings/
-├── observerMixin.js   # 👀 Observer pattern implementation
-```erence guide for design patterns implementations in JavaScript*
-
-## � Purpose
-
-This repository serves as my personal knowledge base for understanding and implementing design patterns in JavaScript. It uses a simple todo application as the foundation to demonstrate various architectural patterns in real, working code.
+---
 
 ## 🏗️ Currently Implemented Patterns
 
@@ -155,7 +133,7 @@ This repository serves as my personal knowledge base for understanding and imple
 
 ---
 
-### 2. **Observer Pattern** �
+### 2. **Observer Pattern** 👀
 **Purpose:** Allows objects to notify multiple observers about state changes
 
 **Location:** `mixings/observerMixin.js` (applied to `TodoList`)
@@ -177,7 +155,7 @@ This repository serves as my personal knowledge base for understanding and imple
 
 ```
 src/
-├── TodoList.js        # 👤 Singleton + � Observer (via mixin)
+├── TodoList.js        # 👤 Singleton + 👀 Observer (via mixin)
 ├── TodoItem.js        # Simple value object/data structure
 mixings/
 ├── observerMixin.js   # 👀 Observer pattern implementation
