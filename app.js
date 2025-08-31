@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
   LocalStorage.load()
 })
 
+document.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    const command = new Command(Commands.ADD)
+    commandExcecutor.execute(command)
+  }
+})
+
 function renderList() {
   DOM.todoList.innerHTML = ''
   const todoList = TodoList.getInstance()
