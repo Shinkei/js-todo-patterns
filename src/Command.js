@@ -1,6 +1,7 @@
 import { Commands } from './utils/commands.js'
 import TodoList from './TodoList.js'
 import TodoItem from './TodoItem.js'
+import TodoMemento from './TodoMemento.js'
 
 // COMMAND PATTERN IMPLEMENTATION
 // ==============================
@@ -68,6 +69,12 @@ export const commandExcecutor = {
         const todoItemToDelete = todoList.find(new TodoItem(todoText))
         if (todoItemToDelete) {
           todoList.delete(todoItemToDelete)
+        }
+        break
+      case Commands.UNDO:
+        const previousState = TodoMemento.pop()
+        if (previousState) {
+          todoList.replaceList(previousState)
         }
         break
       default:

@@ -28,8 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Enter') {
+  if (event.metaKey && event.key === 'Enter') {
     const command = new Command(Commands.ADD)
+    commandExcecutor.execute(command)
+  }
+  if (event.metaKey && event.key === 'z') {
+    const command = new Command(Commands.UNDO)
     commandExcecutor.execute(command)
   }
 })
