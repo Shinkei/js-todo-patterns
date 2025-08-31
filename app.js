@@ -1,4 +1,5 @@
 import Command, { commandExcecutor } from './src/Command.js'
+import { LocalStorage } from './src/storage.js'
 import TodoList from './src/TodoList.js'
 import { Commands } from './src/utils/commands.js'
 
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   TodoList.getInstance().addObserver(renderList)
+  LocalStorage.load()
 })
 
 function renderList() {
