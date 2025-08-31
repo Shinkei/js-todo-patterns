@@ -1,13 +1,14 @@
 import { Commands } from './utils/commands.js'
 import TodoList from './TodoList.js'
+import TodoItem from './TodoItem.js'
 
 class Command {
   name
-  arguments
+  args
 
-  constructor(name, arguments) {
+  constructor(name, args) {
     this.name = name
-    this.arguments = arguments
+    this.args = args
   }
 
   execute() {
@@ -22,16 +23,18 @@ export const commandExcecutor = {
     switch (command.name) {
       case Commands.ADD:
         const todoInput = globalThis.DOM.todoInput
+
         const inputText = todoInput.value.trim()
         const todoItem = new TodoItem(inputText)
         const isTodoItemPresent = todoList.find(todoItem)
 
         if (inputText !== '' && !isTodoItemPresent) {
+          todoInput.value = ''
           todoList.add(todoItem)
         }
         break
       case Commands.DELETE:
-        const [todoText] = arguments
+        const [todoText] = command.args
         const todoItemToDelete = todoList.find(new TodoItem(todoText))
         if (todoItemToDelete) {
           todoList.delete(todoItemToDelete)
@@ -42,3 +45,5 @@ export const commandExcecutor = {
     }
   },
 }
+
+export default Command
