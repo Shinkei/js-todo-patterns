@@ -49,29 +49,39 @@ classDiagram
         +load() void
         +save() void
     }
+    class TodoMemento {
+        +history: Array
+        +push(state) void
+        +pop() Set~TodoItem~
+    }
     TodoList --> TodoItem : contains
     TodoList ..|> observerMixin : implements via mixin
     commandExcecutor ..> Command : executes
     Command ..> TodoList : operates on
     LocalStorage ..> TodoList : persists
     TodoList --> LocalStorage : notifies
+    TodoList --> TodoMemento : notifies
+    TodoMemento ..> TodoList : restores state
     note for TodoList "🔹 Singleton Pattern\n🔹 Observer Pattern"
     note for observerMixin "🔹 Observer Pattern\nReusable via mixin"
     note for Command "🔹 Command Pattern"
     note for commandExcecutor "🔹 Command Pattern\nCentralized execution"
     note for LocalStorage "🔹 Observer Pattern\nPersistence handling"
+    note for TodoMemento "🔹 Memento Pattern\nState history"
     classDef singleton fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     classDef observer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
     classDef mixin fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     classDef entity fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
     classDef command fill:#ffe0e0,stroke:#d32f2f,stroke-width:2px
     classDef storage fill:#e8eaf6,stroke:#3949ab,stroke-width:2px
+    classDef memento fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
     class TodoList singleton
     class observerMixin mixin
     class TodoItem entity
     class Command command
     class commandExcecutor command
     class LocalStorage storage
+    class TodoMemento memento
 ```
 
 ### **Pattern Interaction Flow**
@@ -105,6 +115,7 @@ sequenceDiagram
     TL->>O1: execute() 
     TL->>O2: execute()
     TL->>LocalStorage: save()
+    TL->>TodoMemento: push(state)
     deactivate TL
 
     Note over C,O2: All observers updated automatically
@@ -112,6 +123,13 @@ sequenceDiagram
     Note over LocalStorage: 🔹 Persistence
     C->>LocalStorage: load()
     LocalStorage->>TL: add items from storage
+    
+    Note over C,TodoMemento: 🔹 Undo Operation
+    C->>CMD: new Command(UNDO)
+    C->>CE: execute(command)
+    CE->>TodoMemento: pop()
+    TodoMemento-->>CE: previous state
+    CE->>TL: replaceList(previous state)
 ```
 
 ### **Pattern Application Map**
@@ -120,6 +138,7 @@ flowchart TD
     A[🎯 TodoMasters App] --> B[🔹 Singleton Pattern]
     A --> C[🔹 Observer Pattern]
     A --> D[🕹️ Command Pattern]
+    A --> S[📜 Memento Pattern]
 
     B --> E[📍 TodoList.getInstance]
     B --> F[🗂️ Global State Management]
@@ -133,19 +152,25 @@ flowchart TD
     D --> K[📄 Command.js]
     D --> L[🧩 commandExcecutor]
     D --> M[🗂️ Centralized Action Handling]
+    D --> T[↩️ Undo Functionality]
 
     P[💾 Storage] --> Q[📄 storage.js]
     P --> R[🔁 Load/Save Functionality]
+    
+    S --> U[📄 TodoMemento.js]
+    S --> V[📋 State History Management]
     
     E --> N[📁 src/TodoList.js]
     H --> N
     K --> N
     Q --> N
+    U --> N
 
     classDef singleton fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
-    classDef observer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    classDef observer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
     classDef command fill:#ffe0e0,stroke:#d32f2f,stroke-width:2px
     classDef storage fill:#e8eaf6,stroke:#3949ab,stroke-width:2px
+    classDef memento fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
     classDef file fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
     classDef feature fill:#fff3e0,stroke:#f57c00,stroke-width:2px
 
@@ -153,8 +178,9 @@ flowchart TD
     class C observer
     class D command
     class P storage
+    class S memento
     class N file
-    class E,F,G,H,I,J,K,L,M,O,Q,R feature
+    class E,F,G,H,I,J,K,L,M,O,Q,R,T,U,V feature
 ```
 
 ---
@@ -202,7 +228,7 @@ mixings/
 
 ---
 
-### 3. **Command Pattern** �️
+### 3. **Command Pattern** 🕹️
 **Purpose:** Encapsulates requests as objects, allowing parameterization, queuing, and undo/redo operations.
 
 **Location:** `src/Command.js`, `src/utils/commands.js`, usage in `app.js`
@@ -212,11 +238,14 @@ mixings/
 - `commandExcecutor` handles execution logic for each command type.
 - All UI actions (add/delete) are dispatched as commands, decoupling UI from business logic.
 - Command types are defined in `src/utils/commands.js`.
+- Implements undo functionality through integration with Memento pattern.
+- Keyboard shortcuts for command execution (⌘+Enter to add, ⌘+Z to undo).
 
 **Key Benefits:**
 - Decouples UI events from logic
 - Centralizes action handling
-- - Prepares the codebase for undo/redo and more complex command flows
+- Enables undo functionality
+- Provides consistent interface for all operations
 
 ---
 
@@ -238,6 +267,24 @@ mixings/
 
 ---
 
+### 5. **Memento Pattern** 📜
+**Purpose:** Captures and restores an object's internal state without violating encapsulation
+
+**Location:** `src/TodoMemento.js`, integration with Command pattern in `src/Command.js`
+
+**Implementation Details:**
+- Maintains a history stack of TodoList states
+- Automatically captures state snapshots when TodoList changes via Observer pattern
+- Provides `push()` to store current state and `pop()` to retrieve previous state
+- Integrated with Command pattern for undo functionality (⌘+Z)
+
+**Key Benefits:**
+- Enables undo functionality without exposing object internals
+- Clean separation of concerns between state management and command execution
+- Non-intrusive implementation via Observer pattern
+
+---
+
 ## 🔍 Pattern Analysis
 
 ---
@@ -252,6 +299,7 @@ src/
 ├── Command.js          # 🕹️ Command pattern implementation
 ├── TodoList.js         # 👤 Singleton + 👀 Observer (via mixin)
 ├── TodoItem.js         # Simple value object/data structure
+├── TodoMemento.js      # 📜 Memento pattern for undo functionality
 ├── storage.js          # 💾 LocalStorage persistence
 ├── utils/
 │   └── commands.js     # 🕹️ Command type definitions
@@ -273,6 +321,7 @@ src/
 - Mixin approach keeps patterns modular and reusable
 - LocalStorage observer demonstrates practical usage of the observer pattern
 - Command pattern decouples UI actions from business logic
+- Memento pattern works with Command to provide undo functionality without violating encapsulation
 
 ## 🧠 Learning Notes
 
@@ -291,11 +340,18 @@ src/
 - Centralizing command execution logic simplifies maintenance
 - Naming commands as constants prevents typos and improves code readability
 - Command objects can carry all necessary parameters for execution
+- Integration with Memento provides powerful undo capabilities
 
 ### **Persistence Insights:**
 - Observer pattern provides an elegant way to implement auto-save functionality
 - LocalStorage offers simple client-side persistence without a backend
 - Careful initialization order is crucial for proper loading and observer setup
+
+### **Memento Pattern Insights:**
+- Clean way to implement undo/redo without breaking encapsulation
+- Using a history stack simplifies state management
+- Combining with Observer pattern allows automatic state capture
+- Deep copying objects (using Set and spread operator) prevents reference issues
 
 ### **JavaScript-Specific Considerations:**
 - Private fields (`#data`) provide true encapsulation
@@ -318,7 +374,7 @@ const todoList = TodoList.getInstance()
 const items = todoList.items // Returns Set of TodoItem instances
 ```
 
-### **To Dispatch a Command (Add/Delete):**
+### **To Dispatch a Command (Add/Delete/Undo):**
 ```javascript
 import Command, { commandExcecutor } from './src/Command.js'
 import { Commands } from './src/utils/commands.js'
@@ -330,6 +386,27 @@ commandExcecutor.execute(addCommand)
 // Delete a todo
 const deleteCommand = new Command(Commands.DELETE, ['Some todo text'])
 commandExcecutor.execute(deleteCommand)
+
+// Undo the last action
+const undoCommand = new Command(Commands.UNDO)
+commandExcecutor.execute(undoCommand)
+```
+
+### **Keyboard Shortcuts:**
+```javascript
+// Add keyboard shortcuts for common commands
+document.addEventListener('keydown', event => {
+  // Command+Enter (⌘+Enter) to add todo
+  if (event.metaKey && event.key === 'Enter') {
+    const command = new Command(Commands.ADD)
+    commandExcecutor.execute(command)
+  }
+  // Command+Z (⌘+Z) to undo
+  if (event.metaKey && event.key === 'z') {
+    const command = new Command(Commands.UNDO)
+    commandExcecutor.execute(command)
+  }
+})
 ```
 
 ### **Storage and Loading:**
@@ -348,16 +425,14 @@ LocalStorage.load()
 ## 🔮 Future Pattern Implementations
 
 ### **Planned Additions:**
-- **Undo/Redo for Command Pattern**: Enable undo/redo for user actions
+- **Redo Functionality**: Extend Memento for full undo/redo capability
 - **Strategy Pattern**: For different sorting/filtering algorithms
 - **Factory Pattern**: For creating different types of todo items
-- **Memento Pattern**: For state history management
 
 ### **Implementation Priority:**
-1. Undo/Redo for Command Pattern (high impact for user experience)
+1. Redo functionality (complement to existing undo)
 2. Strategy Pattern (good for demonstrating algorithm flexibility)
 3. Factory Pattern (useful as complexity grows)
-4. Memento Pattern (advanced state management)
 
 ## 💡 Personal Reminders
 
@@ -377,12 +452,18 @@ LocalStorage.load()
 - Implementing undo/redo functionality
 - Decoupling UI from business logic
 - Creating a history of actions
-- **Tip**: Start with a simple implementation and extend as needed
+- **Tip**: Integrate with Memento for powerful state management
 
 ### **When to Use Storage Observers:**
 - Automatic saving of user data
 - Syncing UI with persistent state
 - **Tip**: Register storage observers early to ensure all changes are captured
+
+### **When to Use Memento:**
+- Implementing undo/redo functionality
+- Preserving object state at different points in time
+- Providing snapshots without violating encapsulation
+- **Tip**: Use deep copies to avoid reference issues between states
 
 ### **Code Quality Notes:**
 - Always document pattern usage with comments
