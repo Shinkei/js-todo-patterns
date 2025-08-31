@@ -1,0 +1,44 @@
+import { Commands } from './utils/commands.js'
+import TodoList from './TodoList.js'
+
+class Command {
+  name
+  arguments
+
+  constructor(name, arguments) {
+    this.name = name
+    this.arguments = arguments
+  }
+
+  execute() {
+    throw new Error('Method "execute()" must be implemented.')
+  }
+}
+
+export const commandExcecutor = {
+  execute(command) {
+    const todoList = TodoList.getInstance()
+
+    switch (command.name) {
+      case Commands.ADD:
+        const todoInput = globalThis.DOM.todoInput
+        const inputText = todoInput.value.trim()
+        const todoItem = new TodoItem(inputText)
+        const isTodoItemPresent = todoList.find(todoItem)
+
+        if (inputText !== '' && !isTodoItemPresent) {
+          todoList.add(todoItem)
+        }
+        break
+      case Commands.DELETE:
+        const [todoText] = arguments
+        const todoItemToDelete = todoList.find(new TodoItem(todoText))
+        if (todoItemToDelete) {
+          todoList.delete(todoItemToDelete)
+        }
+        break
+      default:
+        throw new Error(`Unknown command: ${command.name}`)
+    }
+  },
+}
