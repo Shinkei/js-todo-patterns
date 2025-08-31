@@ -1,4 +1,4 @@
-import observerMixin from '../mixings/observerMixin.js'
+import observerMixin from './mixings/observerMixin.js'
 import TodoItem from './TodoItem.js'
 
 class TodoList {
@@ -78,3 +78,5 @@ class TodoList {
 
 // apply the mixing to the class, this adds observer pattern methods to TodoList like an abstract class
 Object.assign(TodoList.prototype, observerMixin)
+
+export default TodoList
